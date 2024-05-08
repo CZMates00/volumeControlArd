@@ -178,6 +178,14 @@ void ledSetVolume(int ring, int volume)
   }
 }
 
+//--------------------------------------------------------------------------------
+// ALL THINGS RELATED TO THE ENCODERS
+
+unsigned long last_SW0 = 0, last_SW1 = 0, last_SW2 = 0; // time of the last switch press
+int last_CLK0 = 0, last_CLK1 = 0, last_CLK2 = 0; // last clk state
+int state_CLK0 = 0, state_CLK1 = 0, state_CLK2 = 0; // current clk state
+bool EN0 = false, EN1 = false, EN2 = false; // encoder enabled = true; encoder disabled = false
+
 void setup() {
 
 }
