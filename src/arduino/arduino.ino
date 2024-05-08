@@ -220,6 +220,49 @@ void setup()
   Serial.println("READY");
 }
 
-void loop() {
-
+void loop()
+{
+  if (!connected)
+  {
+    while (1) // wait for connection with the computer
+    {
+      String msg = Serial.readString();
+      msg.trim();
+      if (msg == "CONNECTED")
+      {
+        connected = true;
+        break;
+      }
+    }
+    while (1) // wait for the initialization data
+    {
+      while (Serial.peek() == -1) {} // wait until data is recieved
+      String setMsg = Serial.readString();
+      setMsg.trim(); // remove all whitespace characters just in case
+      if (setMsg == "DONE") // signals that the initialization is done
+        break;
+      if (setMsg.length() == 11) // accept only the correct message lenght
+      {
+        // parse the data
+        int enc0 = setMsg.substring(0,3).toInt();
+        int enc1 = setMsg.substring(4,7).toInt();
+        int enc2 = setMsg.substring(8,11).toInt();
+        if (enc0 != 999)
+        {
+          EN0 = true;
+          volume0 = enc0;
+        }
+        if (enc1 != 999)
+        {
+          EN1 = true;
+          volume1 = enc1;
+        }
+        if (enc2 != 999)
+        {
+          EN2 = true;
+          volume2 = enc2;
+        }
+      }
+    }
+  }
 }
