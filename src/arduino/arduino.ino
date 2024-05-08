@@ -193,8 +193,31 @@ bool mute_R0 = false, mute_R1 = false, mute_R2 = false; // signals the muted sta
 int volume0 = 0, volume1 = 0, volume2 = 0; // volume values for each encoder
 bool change0 = true, change1 = true, change2 = true; // signals whether a change has occured
 
-void setup() {
+//--------------------------------------------------------------------------------
 
+void setup()
+{
+  Serial.begin(9600); // initialization of the serial communication
+
+  led.begin(); // initialize the leds
+  ledOff(); // clear all the leds
+
+  // encoder 0 pin initialization
+  pinMode(R0_CLK, INPUT_PULLUP);
+  pinMode(R0_DT, INPUT_PULLUP);
+  pinMode(R0_SW, INPUT_PULLUP);
+  
+  // encoder 1 pin initialization
+  pinMode(R1_CLK, INPUT_PULLUP);
+  pinMode(R1_DT, INPUT_PULLUP);
+  pinMode(R1_SW, INPUT_PULLUP);
+
+  // encoder 2 pin initialization
+  pinMode(R2_CLK, INPUT_PULLUP);
+  pinMode(R2_DT, INPUT_PULLUP);
+  pinMode(R2_SW, INPUT_PULLUP);
+
+  Serial.println("READY");
 }
 
 void loop() {
