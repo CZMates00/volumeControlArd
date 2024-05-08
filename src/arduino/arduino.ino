@@ -265,4 +265,90 @@ void loop()
       }
     }
   }
+
+  if (!mute_R0 && change0 && EN0) // display the volume only if not in muted state, if change has occured and if the encoder is enabled
+    ledSetVolume(0, volume0);
+  if (!mute_R1 && change1 && EN1) // display the volume only if not in muted state, if change has occured and if the encoder is enabled
+    ledSetVolume(1, volume1);
+  if (!mute_R2 && change2 && EN2) // display the volume only if not in muted state, if change has occured and if the encoder is enabled
+    ledSetVolume(2, volume2);
+
+  change0 = false;
+  change1 = false;
+  change2 = false;
+  
+  if (EN0) // dont do anything if the encoder is not enabled
+  {
+    state_CLK0 = digitalRead(R0_CLK);
+    if (state_CLK0 != last_CLK0) // the CLK pin is pulled down when a rotation occurs so the current state is different from the previous state
+    {
+      if (digitalRead(R0_DT) != state_CLK0) // clockwise rotation is signaled by the DT pin being in a complementary state to the CLK pin
+      {
+        Serial.println("0:+:0"); // send a message to increment the volume
+        volume0++;
+        if (volume0 > 100)
+          volume0 = 100;
+        change0 = true; // singnals that a change has occured
+      }
+      else // counter-clockwise rotation
+      {
+        Serial.println("0:-:0"); // send a message to decrement the volume
+        volume0--;
+        if (volume0 < 0)
+          volume0 = 0;
+        change0 = true; // signals that a change has occured
+      }
+    }
+    last_CLK0 = state_CLK0;
+  }
+
+  if (EN1) // dont do anything if the encoder is not enabled
+  {
+    state_CLK1 = digitalRead(R1_CLK);
+    if (state_CLK1 != last_CLK1) // the CLK pin is pulled down when a rotation occurs so the current state is different from the previous state
+    {
+      if (digitalRead(R1_DT) != state_CLK1) // clockwise rotation is signaled by the DT pin being in a complementary state to the CLK pin
+      {
+        Serial.println("1:+:0"); // send a message to increment the volume
+        volume1++;
+        if (volume1 > 100)
+          volume1 = 100;
+        change1 = true; // singnals that a change has occured
+      }
+      else // counter-clockwise rotation
+      {
+        Serial.println("1:-:0"); // send a message to decrement the volume
+        volume1--;
+        if (volume1 < 0)
+          volume1 = 0;
+        change1 = true; // signals that a change has occured
+      }
+    }
+    last_CLK1 = state_CLK1;
+  }
+
+  if (EN2) // dont do anything if the encoder is not enabled
+  {
+    state_CLK2 = digitalRead(R2_CLK);
+    if (state_CLK2 != last_CLK2) // the CLK pin is pulled down when a rotation occurs so the current state is different from the previous state
+    {
+      if (digitalRead(R2_DT) != state_CLK2) // clockwise rotation is signaled by the DT pin being in a complementary state to the CLK pin
+      {
+        Serial.println("2:+:0"); // send a message to increment the volume
+        volume2++;
+        if (volume2 > 100)
+          volume2 = 100;
+        change2 = true; // singnals that a change has occured
+      }
+      else // counter-clockwise rotation
+      {
+        Serial.println("2:-:0"); // send a message to decrement the volume
+        volume2--;
+        if (volume2 < 0)
+          volume2 = 0;
+        change2 = true; // signals that a change has occured
+      }
+    }
+    last_CLK2 = state_CLK2;
+  }
 }
