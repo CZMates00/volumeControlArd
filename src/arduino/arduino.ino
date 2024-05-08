@@ -186,6 +186,13 @@ int last_CLK0 = 0, last_CLK1 = 0, last_CLK2 = 0; // last clk state
 int state_CLK0 = 0, state_CLK1 = 0, state_CLK2 = 0; // current clk state
 bool EN0 = false, EN1 = false, EN2 = false; // encoder enabled = true; encoder disabled = false
 
+//--------------------------------------------------------------------------------
+// global variables
+bool connected = false; // signals whether a connection with computer was initialized
+bool mute_R0 = false, mute_R1 = false, mute_R2 = false; // signals the muted state
+int volume0 = 0, volume1 = 0, volume2 = 0; // volume values for each encoder
+bool change0 = true, change1 = true, change2 = true; // signals whether a change has occured
+
 void setup() {
 
 }
