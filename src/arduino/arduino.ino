@@ -351,4 +351,61 @@ void loop()
     }
     last_CLK2 = state_CLK2;
   }
+
+  int btnr0 = !digitalRead(R0_SW);
+  if (btnr0 && EN0) // dont do anything if the encoder is not enabled
+  {
+    if (millis() - last_SW0 > DELAY) // button debounce
+    {
+      Serial.println("0:0:1"); // send the correct message according to the encoder
+      last_SW0 = millis();
+      mute_R0 = !mute_R0;
+      // toggle between muted and unmuted state
+      if (mute_R0)
+        muted(0);
+      if (!mute_R0)
+      {
+        ledClear(0);
+        change0 = true; // signal that a change has occured
+      }
+    }
+  }
+
+  int btnr1 = !digitalRead(R1_SW);
+  if (btnr1 && EN1) // dont do anything if the encoder is not enabled
+  {
+    if (millis() - last_SW1 > DELAY) // button debounce
+    {
+      Serial.println("1:0:1"); // send the correct message according to the encoder
+      last_SW1 = millis();
+      mute_R1 = !mute_R1;
+      // toggle between muted and unmuted state
+      if (mute_R1)
+        muted(1);
+      if (!mute_R1)
+      {
+        ledClear(1);
+        change1 = true; // signal that a change has occured
+      }
+    }
+  }
+
+  int btnr2 = !digitalRead(R2_SW);
+  if (btnr2 && EN2) // dont do anything if the encoder is not enabled
+  {
+    if (millis() - last_SW2 > DELAY) // button debounce
+    {
+      Serial.println("2:0:1"); // send the correct message according to the encoder
+      last_SW2 = millis();
+      mute_R2 = !mute_R2;
+      // toggle between muted and unmuted state
+      if (mute_R2)
+        muted(2);
+      if (!mute_R2)
+      {
+        ledClear(2);
+        change2 = true; // signal that a change has occured
+      }
+    }
+  }
 }
