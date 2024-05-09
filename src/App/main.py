@@ -4,6 +4,7 @@ from winvol import CVolume
 import time
 import sys
 
+
 # global variables - it is easier to use global variables than to pass all of these variables into functions
 done = False # controlling the main loop
 # app lists
@@ -194,6 +195,63 @@ def sendInit(conn, vol):
     time.sleep(2)
     conn.writeData("DONE") # telling Arduino to start the main program
 
+# mute functionality
+# different handling depending on whether the master or list is chosen
+def eMute(vol, e):
+    l = assignmentDict[e]
+    if l == "master": vol.toggleMasterState(); return
+    for item in l:
+        try: # dont crash the program if the app in list is not running
+            pass
+        except: continue
+
+# volume incrementation
+# different handling depending on whether the master or list is chosen
+def eVolInc(vol, e):
+    l = assignmentDict[e]
+    if l == "master": vol.setMasterVolumeIncNative(1); return
+    for item in l:
+        try: # dont crash the program if the app in list is not running
+            vol.setSessionVolumeInc(item, 1)
+        except: continue
+
+# volume decrementation
+# different handling depending on whether the master or list is chosen
+def eVolDec(vol, e):
+    l = assignmentDict[e]
+    if l == "master": vol.setMasterVolumeDecNative(1); return
+    for item in l:
+        try: # dont crash the program if the app in list is not running
+            vol.setSessionVolumeDec(item, 1)
+        except: continue
+
+def main(conn, vol, lists):
+    global done
+    cnt = 0
+    while not done:
+        # future synchronization implementation
+        # cnt += 1
+        # if cnt > 1000: sendInit(conn, vol); cnt = 0 # synchronization
+
+        data = conn.readData()
+        try:
+            eid, ech, ebtn = data.split(":") # eid = encoder id; ech = change vol up/down; ebtn = mute (button press)
+        except: continue
+        if (eid == '0'):
+            if int(ebtn) == 1: eMute(vol, "e0")
+            if ech == '+': eVolInc(vol, "e0")
+            if ech == '-': eVolDec(vol, "e0")
+
+        if (eid == '1' and lists > 1):
+            if int(ebtn) == 1: eMute(vol, "e1")
+            if ech == '+': eVolInc(vol, "e1")
+            if ech == '-': eVolDec(vol, "e1")
+
+        if (eid == '2' and lists > 2):
+            if int(ebtn) == 1: eMute(vol, "e2")
+            if ech == '+': eVolInc(vol, "e2")
+            if ech == '-': eVolDec(vol, "e2")
+
 
 if __name__ == '__main__':
     # find connection
@@ -215,6 +273,8 @@ if __name__ == '__main__':
     conn.writeData("CONNECTED") # tell Arduino that the program is ready
     time.sleep(2)
     sendInit(conn, vol) # tell Arduino current volume levels and which encoders should be enabled
+
+    main(conn, vol, lists)
 
     time.sleep(1)
     # close connection
