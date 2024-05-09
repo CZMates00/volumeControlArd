@@ -123,6 +123,78 @@ def assignEncoders():
     print(f"\t list 1: {str(apps1)}")
     print(f"\t list 2: {str(apps2)}")
 
+# send current volume and enabled encoders to Arduino
+def sendInit(conn, vol):
+    global assignmentDict
+    time.sleep(1)
+    buf = "" # using buffer for easy interpretation on Arduino
+    if (assignmentDict['e0'] == "master"): # e0 is the only valid encoder for master volume control
+        vol0 = vol.getMasterVolumeNative()
+        if (vol0 < 10): buf += "00"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        elif (vol0 >= 10 and vol0 < 100): buf += "0"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        else: buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        buf += ":"
+    elif (assignmentDict['e0'] != None):
+        vol0array = []
+        # find all running apps in the app-list volumes and store them in an array
+        for v in assignmentDict['e0']:
+            try:
+                vol0 = vol.getSessionVolume(v)
+                if (type(vol0) is int): vol0array.append(vol0) # dont append if the app is not running
+            except: continue # dont crash the program if the app is not running
+        vol0 = max(vol0array) # find the maximum volume of all the apps in one list
+        for s in assignmentDict['e0']: # assign the maximum volume to all the apps in the list
+            try:
+                vol.setSessionVolume(s, vol0)
+            except: continue # dont crash the program if the app is not running
+        if (vol0 < 10): buf += "00"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        elif (vol0 >= 10 and vol0 < 100): buf += "0"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        else: buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        buf += ":"
+    else: buf += str(999); buf += ":" # if the encoder shall not be enabled, use 999 as the value; using : as a delimiter
+
+    if (assignmentDict['e1'] != None):
+        vol1array = []
+        # find all running apps in the app-list volumes and store them in an array
+        for v in assignmentDict['e1']:
+            try:
+                vol1 = vol.getSessionVolume(v)
+                if (type(vol1) is int): vol1array.append(vol1) # dont append if the app is not running
+            except: continue # dont crash the program if the app is not running
+        vol1 = max(vol1array) # find the maximum volume of all the apps in one list
+        for s in assignmentDict['e1']: # assign the maximum volume to all the apps in the list
+            try:
+                vol.setSessionVolume(s, vol1)
+            except: continue # dont crash the program if the app is not running
+        if (vol1 < 10): buf += "00"; buf += str(vol1) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        elif (vol1 >= 10 and vol1 < 100): buf += "0"; buf += str(vol1) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        else: buf += str(vol1) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        buf += ":"
+    else: buf += str(999); buf += ":" # if the encoder shall not be enabled, use 999 as the value; using : as a delimiter
+
+    if (assignmentDict['e2'] != None):
+        vol2array = []
+        # find all running apps in the app-list volumes and store them in an array
+        for v in assignmentDict['e2']:
+            try:
+                vol2 = vol.getSessionVolume(v)
+                if (type(vol2) is int): vol2array.append(vol2) # dont append if the app is not running
+            except: continue # dont crash the program if the app is not running
+        vol2 = max(vol2array) # find the maximum volume of all the apps in one list
+        for s in assignmentDict['e2']: # assign the maximum volume to all the apps in the list
+            try:
+                vol.setSessionVolume(s, vol2)
+            except: continue # dont crash the program if the app is not running
+        if (vol2 < 10): buf += "00"; buf += str(vol2) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        elif (vol2 >= 10 and vol2 < 100): buf += "0"; buf += str(vol2) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+        else: buf += str(vol2) # zero-padding to hit the targeted format XXX:YYY:ZZZ
+    else: buf += str(999) # if the encoder shall not be enabled, use 999 as the value
+    
+    conn.writeData(buf) # sending the configuration at once
+    time.sleep(2)
+    conn.writeData("DONE") # telling Arduino to start the main program
+
+
 if __name__ == '__main__':
     # find connection
     choice = serialPortList()
@@ -139,6 +211,10 @@ if __name__ == '__main__':
     if lists == -1: assignmentDict["e0"] = "master" # automatic master assignment
     elif lists == 0:assignmentDict["e0"] = apps0; assignmentDict["e1"] = apps1; assignmentDict["e2"] = apps2 # default list assignment
     else: assignEncoders() # manual assignment
+
+    conn.writeData("CONNECTED") # tell Arduino that the program is ready
+    time.sleep(2)
+    sendInit(conn, vol) # tell Arduino current volume levels and which encoders should be enabled
 
     time.sleep(1)
     # close connection
