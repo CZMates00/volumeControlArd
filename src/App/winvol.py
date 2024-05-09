@@ -88,3 +88,66 @@ class CVolume():
     def setMasterVolumeDecNative(self, volDec):
         cur = self.getMasterVolumeNative()
         self.setMasterVolumeNative(cur-volDec)
+
+    # get all sessions for further volume modification
+    def getSessions(self):
+        self.m_sessions = AudioUtilities.GetAllSessions()
+        return self.m_sessions
+    
+    # find all running applications names and return them as a list
+    def getSessionsNames(self):
+        self.m_sessions = AudioUtilities.GetAllSessions()
+        self.m_s_array = []
+        for s in self.m_sessions:
+            if s.Process:
+                self.m_s_array.append(s.Process.name())
+        return self.m_s_array
+    
+    # find all running applications names and return them to the user specified list
+    def getSessionNamesOut(self, array):
+        self.m_sessions = AudioUtilities.GetAllSessions()
+        for s in self.m_sessions:
+            if s.Process:
+                array.append(str(s.Process.name()))
+    
+    # set the specified sessions' volume to vol percent of the default audio output device
+    # when vol > 100, volume is set to 100
+    # when vol < 0, volume is set to 0
+    def setSessionVolume(self, sessionName, vol):
+        if vol > 100: v = 100
+        if vol < 0: v = 0
+        else: v = vol
+        for s in self.getSessions():
+            volume = s._ctl.QueryInterface(ISimpleAudioVolume)
+            if s.Process and s.Process.name().lower() == sessionName.lower():
+                volume.SetMasterVolume(v/100, None)
+    
+    # get session volume; value returned is in % of master output level
+    def getSessionVolume(self, sessionName):
+        for s in self.getSessions():
+            volume = s._ctl.QueryInterface(ISimpleAudioVolume)
+            if s.Process and s.Process.name().lower() == sessionName.lower():
+                return round(volume.GetMasterVolume()*100)
+            
+    # increment session volume
+    def setSessionVolumeInc(self, sessionName, volInc):
+        cur = self.getSessionVolume(sessionName)
+        self.setSessionVolume(sessionName, cur+volInc)
+
+    # decrement session volume
+    def setSessionVolumeDec(self, sessionName, volDec):
+        cur = self.getSessionVolume(sessionName)
+        self.setSessionVolume(sessionName, cur-volDec)
+
+    # returns 0 if the session is not muted
+    # returns 1 if the session is muted
+    def getSessionState(self, sessionName):
+        pass
+
+    # set the sessions mute state 0 or 1
+    def setSessionState(self, sessionName):
+        pass
+
+    # toggle between muted and unmuted state
+    def toggleSessionState(self, sessionName):
+        pass
