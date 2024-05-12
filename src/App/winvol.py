@@ -33,7 +33,7 @@ class CVolume():
     # 0 for unmute
     # 1 for mute
     def setMasterState(self, mute):
-        if (type(mute) is not int): raise TypeError("Mute must be int type!")
+        if (type(mute) is not int): raise TypeError("Mute must be int type!"); return
         if int(mute) > 1 or int(mute) < 0: raise Exception("Invalid mute value!"); return
         self.m_master_volume.SetMute(int(mute), None)
     
@@ -142,12 +142,21 @@ class CVolume():
     # returns 0 if the session is not muted
     # returns 1 if the session is muted
     def getSessionState(self, sessionName):
-        pass
+        for s in self.getSessions():
+            volume = s._ctl.QueryInterface(ISimpleAudioVolume)
+            if s.Process and s.Process.name().lower() == sessionName.lower():
+                return volume.GetMute()
 
     # set the sessions mute state 0 or 1
-    def setSessionState(self, sessionName):
-        pass
+    def setSessionState(self, sessionName, mute):
+        if (type(mute) is not int): raise TypeError("Mute must be int type!"); return
+        if (int(mute) > 1 or int(mute) < 0): raise Exception("Invalid mute value!"); return
+        for s in self.getSessions():
+            volume = s._ctl.QueryInterface(ISimpleAudioVolume)
+            if s.Process and s.Process.name().lower() == sessionName.lower():
+                return volume.SetMute(int(mute), None)
 
     # toggle between muted and unmuted state
     def toggleSessionState(self, sessionName):
-        pass
+        if (self.getSessionState(sessionName)): self.setSessionState(sessionName, 0)
+        else: self.setSessionState(sessionName, 1)
