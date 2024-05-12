@@ -131,6 +131,7 @@ def sendInit(conn, vol):
     buf = "" # using buffer for easy interpretation on Arduino
     if (assignmentDict['e0'] == "master"): # e0 is the only valid encoder for master volume control
         vol0 = vol.getMasterVolumeNative()
+        vol.setMasterState(0) # unmute master volume output
         if (vol0 < 10): buf += "00"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
         elif (vol0 >= 10 and vol0 < 100): buf += "0"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
         else: buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
@@ -147,6 +148,7 @@ def sendInit(conn, vol):
         for s in assignmentDict['e0']: # assign the maximum volume to all the apps in the list
             try:
                 vol.setSessionVolume(s, vol0)
+                vol.setSessionState(s, 0) # unmute all applications in the list
             except: continue # dont crash the program if the app is not running
         if (vol0 < 10): buf += "00"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
         elif (vol0 >= 10 and vol0 < 100): buf += "0"; buf += str(vol0) # zero-padding to hit the targeted format XXX:YYY:ZZZ
@@ -166,6 +168,7 @@ def sendInit(conn, vol):
         for s in assignmentDict['e1']: # assign the maximum volume to all the apps in the list
             try:
                 vol.setSessionVolume(s, vol1)
+                vol.setSessionState(s, 0) # unmute all applications in the list
             except: continue # dont crash the program if the app is not running
         if (vol1 < 10): buf += "00"; buf += str(vol1) # zero-padding to hit the targeted format XXX:YYY:ZZZ
         elif (vol1 >= 10 and vol1 < 100): buf += "0"; buf += str(vol1) # zero-padding to hit the targeted format XXX:YYY:ZZZ
@@ -185,6 +188,7 @@ def sendInit(conn, vol):
         for s in assignmentDict['e2']: # assign the maximum volume to all the apps in the list
             try:
                 vol.setSessionVolume(s, vol2)
+                vol.setSessionState(s, 0) # unmute all applications in the list
             except: continue # dont crash the program if the app is not running
         if (vol2 < 10): buf += "00"; buf += str(vol2) # zero-padding to hit the targeted format XXX:YYY:ZZZ
         elif (vol2 >= 10 and vol2 < 100): buf += "0"; buf += str(vol2) # zero-padding to hit the targeted format XXX:YYY:ZZZ
@@ -202,7 +206,7 @@ def eMute(vol, e):
     if l == "master": vol.toggleMasterState(); return
     for item in l:
         try: # dont crash the program if the app in list is not running
-            pass
+            vol.toggleSessionState(item)
         except: continue
 
 # volume incrementation
