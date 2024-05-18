@@ -10,6 +10,14 @@ The aim of this project is to create a Arduino-powered controller used for contr
 - soldering iron, wires
 - time :)
 
+## Computer app
+
+Download the python [files](https://github.com/CZMates00/volumeControlArd/tree/main/src/App), install pycaw, pyserial, comtypes python modules and run the main.py file. The setup wizard will then walk you through all the steps to get the app running.
+
+## Arduino app
+
+Download the [arduino.ino](https://github.com/CZMates00/volumeControlArd/tree/main/src/arduino) sketch file, install the official Adafruit NeoPixel library and upload the file to your Arduino.
+
 ## Printable case
 
 To accomodate 3 rotary encoders and 3 led rings, there is a 3D printable case, which can be found [here](https://www.printables.com/cs/model/873823-pc-audio-controller-with-arduino).
